@@ -1,32 +1,25 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:hive/hive.dart';
-import 'package:file_picker/file_picker.dart';
 import '../models/template_model.dart';
 
-Future<File?> exportTemplatesToCustomFolder() async {
+// You must now use a fixed path or show an error if export/import is attempted.
+// Example: Save to project root (not recommended for production apps)
+final String exportFileName = 'gymbro_export.json';
+
+Future<File> exportTemplatesToAppDirectory() async {
   final box = Hive.box<TemplateModel>('workouts');
   final templates = box.values.map((t) => t.toJson()).toList();
   final jsonString = jsonEncode(templates);
 
-  // Let user pick a directory
-  String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-  if (selectedDirectory == null) return null; // User canceled
-
-  final file = File('$selectedDirectory/gymbro_export.json');
+  final file = File(exportFileName);
   return file.writeAsString(jsonString);
 }
 
-Future<void> importTemplatesFromCustomFile() async {
-  // Let user pick a file
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: ['json'],
-  );
-  if (result == null || result.files.single.path == null)
-    return; // User cancelled
+Future<void> importTemplatesFromAppDirectory() async {
+  final file = File(exportFileName);
+  if (!await file.exists()) return;
 
-  final file = File(result.files.single.path!);
   final box = Hive.box<TemplateModel>('workouts');
   final jsonString = await file.readAsString();
   final List<dynamic> jsonList = jsonDecode(jsonString);

@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import '../utils/export_import.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -18,7 +16,7 @@ class SettingsScreen extends StatelessWidget {
               icon: const Icon(Icons.upload_file),
               label: const Text('Export Templates'),
               onPressed: () async {
-                final file = await exportTemplatesToCustomFolder();
+                final file = await exportTemplatesToAppDirectory();
                 if (file != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Exported to ${file.path}')),
@@ -36,7 +34,7 @@ class SettingsScreen extends StatelessWidget {
               label: const Text('Import Templates'),
               onPressed: () async {
                 try {
-                  await importTemplatesFromCustomFile();
+                  await importTemplatesFromAppDirectory();
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Templates imported!')),
                   );
@@ -48,8 +46,9 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Exported file can be saved anywhere. To import, pick any gymbro_export.json file from your device.',
+                       const Text(
+              'Exported file is saved in your app\'s documents directory as gymbro_export.json.\n'
+              'To import, place gymbro_export.json in the same directory on this device.',
               textAlign: TextAlign.center,
             ),
           ],
